@@ -5,3 +5,7 @@ scikit-learn
 matplotlib
 seaborn
 scipy
+- Tuning (URL-only): number of trees barely matters (AUC about 0.998); tree depth matters (RF depth 5 misses about 18 per 1,000, unlimited depth about 5.6). Gradient boosting is stable across learning rates and iterations.
+- Error analysis: out-of-fold gradient boosting missed 120 of 21,354 phishing URLs; the missed ones look like short ordinary HTTPS homepages (`results/missed_phishing_examples.csv`).
+- Naive Bayes recall is 0.44 unscaled and 0.82 scaled, so scaling explains the gap to the proposal's 0.41.
+- Saved model: `models/url_only_gb.joblib` (gradient boosting on the 19 URL features, features in `models/url_only_features.json`), trained on all cleaned rows; its performance is the cross-validation score, not a score on its own training data.
