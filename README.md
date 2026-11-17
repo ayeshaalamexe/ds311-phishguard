@@ -22,15 +22,13 @@ Notebook: `notebooks/03_mining_lead.ipynb` (runs top to bottom in Colab, seed 42
 - Domain-grouped CV gave almost the same scores as normal CV. Few domains repeat in the data, so this test is limited.
 - Page-content features still reach AUC 1.000 after removing the 7 suspects, so the URL-only score is the fair headline.
 - Phishing URLs form 3 loose groups (silhouette 0.245): short plain HTTP URLs, medium HTTPS URLs, very long parameter-heavy URLs.
+- Tuning (URL-only): number of trees barely matters (AUC about 0.998); tree depth matters (RF depth 5 misses about 18 per 1,000, unlimited depth about 5.6). Gradient boosting is stable across learning rates and iterations.
+- Error analysis: out-of-fold gradient boosting missed 120 of 21,354 phishing URLs; the missed ones look like short ordinary HTTPS homepages (`results/missed_phishing_examples.csv`).
+- Naive Bayes recall is 0.44 unscaled and 0.82 scaled, so scaling explains the gap to the proposal's 0.41.
+- Saved model: `models/url_only_gb.joblib` (gradient boosting on the 19 URL features, features in `models/url_only_features.json`), trained on all cleaned rows; its performance is the cross-validation score, not a score on its own training data.
 
 **Limitations:** the dataset is easy (legitimate URLs are mostly short homepages), cluster structure is weak, and clusters were not checked against real campaigns.
-## Product Lead (Hassaan): URL-text model, robustness test and app
 
-Notebook: `notebooks/04_product_lead.ipynb` (runs top to bottom in Colab, seed 42). Files are in `product/`.
+## Product Lead (Hassaan)
 
-- URL-text model on 33 features built from the raw URL string; model used in the app: **both**.
-- 5-fold CV: ROC-AUC 0.9990, phishing recall 0.9956, about 4.4 missed phishing and 0.0 false alarms per 1,000.
-- Robustness: worst change is "force https" (65.4% of phishing still caught).
-- Run the app: `pip install -r product/requirements.txt` then `streamlit run product/app.py`.
-- URLs are only treated as text and are never opened.
-
+(Paste the generated `README_product_section.md` text here after running notebook 04.)
