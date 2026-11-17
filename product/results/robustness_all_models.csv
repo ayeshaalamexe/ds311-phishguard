@@ -1,0 +1,28 @@
+change,model,phishing_still_caught_percent,legit_flagged_percent
+none (original URLs),features,99.7,0.0
+none (original URLs),tfidf,99.6,0.0
+none (original URLs),both,99.7,0.0
+force https,features,65.8,0.0
+force https,tfidf,64.4,0.0
+force https,both,65.4,0.0
+homepage only (drop path and query),features,98.4,0.0
+homepage only (drop path and query),tfidf,98.0,0.0
+homepage only (drop path and query),both,98.4,0.0
+add www.,features,98.8,0.0
+add www.,tfidf,96.4,0.0
+add www.,both,98.8,0.0
+extra sub-domains (secure.login.),features,100.0,100.0
+extra sub-domains (secure.login.),tfidf,100.0,99.7
+extra sub-domains (secure.login.),both,100.0,100.0
+"homoglyphs (o to 0, l to 1 in domain)",features,99.7,0.9
+"homoglyphs (o to 0, l to 1 in domain)",tfidf,99.4,0.0
+"homoglyphs (o to 0, l to 1 in domain)",both,99.7,0.0
+add random query (?id=...),features,99.7,0.8
+add random query (?id=...),tfidf,99.8,0.2
+add random query (?id=...),both,99.7,0.1
+toggle trailing slash,features,99.7,100.0
+toggle trailing slash,tfidf,99.5,16.9
+toggle trailing slash,both,99.8,99.5
+link shortener (bit.ly/...),features,100.0,100.0
+link shortener (bit.ly/...),tfidf,100.0,100.0
+link shortener (bit.ly/...),both,100.0,100.0

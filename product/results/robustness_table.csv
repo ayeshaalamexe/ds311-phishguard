@@ -1,0 +1,10 @@
+change,phishing_still_caught_percent,legit_flagged_percent
+none (original URLs),99.7,0.0
+force https,65.4,0.0
+homepage only (drop path and query),98.4,0.0
+add www.,98.8,0.0
+extra sub-domains (secure.login.),100.0,100.0
+"homoglyphs (o to 0, l to 1 in domain)",99.7,0.0
+add random query (?id=...),99.7,0.1
+toggle trailing slash,99.8,99.5
+link shortener (bit.ly/...),100.0,100.0
