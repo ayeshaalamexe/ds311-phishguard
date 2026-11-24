@@ -1,0 +1,34 @@
+feature,meaning,mutual_info
+num_slashes,Number of '/' signs,0.28600421864790104
+path_length,Path length,0.27990377420042556
+has_www,Starts with www.,0.27664495653740784
+is_https,Uses https,0.23663077478727224
+letter_ratio,Share of letters,0.21817855903394667
+num_other_special,Other special characters,0.19962447651584014
+special_ratio,"Share of non-letter, non-digit characters",0.1897890832361684
+digit_ratio,Share of digits,0.1733933278527584
+num_digits,Number of digits,0.1732010047212187
+entropy,Randomness of characters (entropy),0.16802582676659417
+longest_digit_run,Longest run of digits,0.16413887401081761
+url_length,URL length,0.16167176961610719
+num_digits_in_host,Digits in the domain,0.11452476642877985
+num_letters,Number of letters,0.11417059148427011
+domain_length,Domain length,0.08921220399746166
+num_subdomains,Number of sub-domains,0.0751963491613783
+num_dots_in_host,Dots in the domain,0.07327174611878373
+num_hyphens_in_host,Hyphens in the domain,0.05674172265399968
+longest_host_label,Longest part of the domain,0.03470821075864161
+common_tld,Ends in .com/.org/.net/.edu/.gov,0.0295950704849246
+query_length,Query (after '?') length,0.02651277139946373
+has_query,Has a query part,0.022648161385907084
+num_qmark,Number of '?' signs,0.02213129439964212
+num_equals,Number of '=' signs,0.02108171457078134
+tld_length,Length of the ending (TLD),0.020004875060223304
+num_suspicious_words,"Suspicious words (login, verify, ...)",0.019568675908917754
+num_ampersand,Number of '&' signs,0.013684284101238564
+has_obfuscation,Has encoded characters,0.004671359548382936
+num_percent,Number of '%' (encoded characters),0.003649701055516319
+num_at,Number of '@' signs,0.0020203433253302983
+is_ip,Domain is an IP address,0.0017805842227287538
+has_port,Has a port number,0.0
+is_shortener,Is a link shortener,0.0

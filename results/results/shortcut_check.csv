@@ -1,0 +1,11 @@
+url_version,model,roc_auc,precision,recall,missed_phish_per_1000,false_alarms_per_1000,data
+A. Full URL (what the app uses),feature model,0.9984,0.9997,0.9952,4.7766,0.2095,"50,000 URLs"
+A. Full URL (what the app uses),text model,0.9989,1.0,0.9911,8.8508,0.0,"50,000 URLs"
+A. Full URL (what the app uses),both (average),0.9989,1.0,0.9951,4.9171,0.0,"50,000 URLs"
+B. No scheme / www. / trailing slash,feature model,0.8932,0.9414,0.7267,273.3446,33.722,"50,000 URLs"
+B. No scheme / www. / trailing slash,text model,0.933,0.9174,0.8106,189.379,54.423,"50,000 URLs"
+B. No scheme / www. / trailing slash,both (average),0.9325,0.9679,0.7876,212.3724,19.4792,"50,000 URLs"
+C. Host only,feature model,0.8558,0.9057,0.6618,338.2036,51.351,"50,000 URLs"
+C. Host only,text model,0.9145,0.8794,0.78,220.0056,79.7668,"50,000 URLs"
+C. Host only,both (average),0.9127,0.9407,0.7428,257.1883,34.9089,"50,000 URLs"
+A. Full URL (what the app uses),both: recall on the 141 phishing URLs that copy the legit shape,,,0.2553,744.6809,,"50,000 URLs"

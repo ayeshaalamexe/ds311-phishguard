@@ -1,0 +1,7 @@
+trait,legitimate_percent,phishing_percent,data
+starts with https://,100.0,48.7,"50,000 URLs"
+host starts with www.,100.0,41.6,"50,000 URLs"
+nothing after the domain,100.0,40.2,"50,000 URLs"
+ends with '/',0.0,36.1,"50,000 URLs"
+has a query (?),0.0,6.2,"50,000 URLs"
+ALL of: https + www. + nothing after,100.0,0.7,"50,000 URLs"
