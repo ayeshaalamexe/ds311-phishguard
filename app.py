@@ -1,4 +1,4 @@
-# PhishGuard: Streamlit app (Product Lead: Hassaan)
+# PhishGuard: Streamlit app
 # The app only reads the URL as TEXT. It never opens or visits a URL.
 import sys
 from pathlib import Path
@@ -8,9 +8,25 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
 
-BASE = Path(__file__).parent          # the product/ folder
-ROOT = BASE.parent                    # the repo folder (has results/ from the Mining Lead)
-sys.path.insert(0, str(BASE))
+BASE = Path(__file__).resolve().parent      # folder that holds app.py (repo root on Streamlit Cloud)
+
+# Files may sit next to app.py, inside product/, or one level up.
+# locate() checks each place so the app works whichever layout the repo has.
+SEARCH_DIRS = []
+for d in [BASE, BASE / "product", BASE.parent]:
+    if d not in SEARCH_DIRS:
+        SEARCH_DIRS.append(d)
+    if str(d) not in sys.path:
+        sys.path.insert(0, str(d))
+
+
+def locate(*parts):
+    for d in SEARCH_DIRS:
+        p = d.joinpath(*parts)
+        if p.exists():
+            return p
+    return BASE.joinpath(*parts)            # not found: return the default path
+
 
 from url_features import (FEATURE_NAMES, FEATURE_TEXT, normalize_url, url_features,
                           predict_scores, explain_features, explain_text, template_notes)
@@ -20,7 +36,7 @@ st.set_page_config(page_title="PhishGuard", page_icon="🛡️", layout="wide")
 
 @st.cache_resource
 def load_bundle():
-    return joblib.load(BASE / "models" / "phishguard_bundle.joblib")
+    return joblib.load(locate("models", "phishguard_bundle.joblib"))
 
 
 @st.cache_data
@@ -28,18 +44,25 @@ def load_csv(path):
     return pd.read_csv(path)
 
 
-def show_csv_if_exists(path, title):
-    if Path(path).exists():
+def show_csv_if_exists(rel, title):
+    path = locate("results", rel)
+    if path.exists():
         st.subheader(title)
         st.dataframe(load_csv(path), hide_index=True)
 
 
-def show_image_if_exists(path, caption):
-    if Path(path).exists():
+def show_image_if_exists(rel, caption):
+    path = locate("results", rel)
+    if path.exists():
         st.image(str(path), caption=caption)
 
 
-bundle = load_bundle()
+try:
+    bundle = load_bundle()
+except FileNotFoundError:
+    st.error("Model file not found: models/phishguard_bundle.joblib. "
+             "Check that the models folder is in the repo.")
+    st.stop()
 
 st.title("🛡️ PhishGuard: Phishing URL Miner")
 st.caption("Paste a URL to get a risk score. PhishGuard only reads the text of the URL. "
@@ -77,7 +100,8 @@ with tab1:
 
             notes = template_notes(url)
             if notes:
-                with st.expander("How much should you trust this score? (read this)", expanded=score >= 0.3):
+                with st.expander("How much should you trust this score? (read this)",
+                                 expanded=score >= 0.3):
                     st.write("The training data (PhiUSIIL) has a very narrow idea of a legitimate URL: "
                              "**https://www.name.tld** and nothing else. This URL differs from that shape:")
                     for note in notes:
@@ -91,22 +115,18 @@ with tab1:
                 table["effect_on_score"] = table["effect_on_score"].round(2)
                 up = table[table["effect_on_score"] > 0.05].head(5)
                 down = table[table["effect_on_score"] < -0.05].sort_values("effect_on_score").head(3)
+                rename = {"meaning": "trait", "value": "this URL",
+                          "typical_legit_value": "typical legitimate URL",
+                          "effect_on_score": "push (log-odds)"}
+                cols = ["meaning", "value", "typical_legit_value", "effect_on_score"]
                 if len(up) > 0:
                     st.write("**Raise the risk:**")
-                    st.dataframe(up[["meaning", "value", "typical_legit_value", "effect_on_score"]]
-                                 .rename(columns={"meaning": "trait", "value": "this URL",
-                                                  "typical_legit_value": "typical legitimate URL",
-                                                  "effect_on_score": "push (log-odds)"}),
-                                 hide_index=True)
+                    st.dataframe(up[cols].rename(columns=rename), hide_index=True)
                 else:
                     st.write("No single trait raises the risk by much.")
                 if len(down) > 0:
                     st.write("**Lower the risk:**")
-                    st.dataframe(down[["meaning", "value", "typical_legit_value", "effect_on_score"]]
-                                 .rename(columns={"meaning": "trait", "value": "this URL",
-                                                  "typical_legit_value": "typical legitimate URL",
-                                                  "effect_on_score": "push (log-odds)"}),
-                                 hide_index=True)
+                    st.dataframe(down[cols].rename(columns=rename), hide_index=True)
                 st.caption("How this is computed: starting from a typical legitimate URL, the traits are "
                            "switched to this URL's values in random order (40 times) and we average how "
                            "much each switch moves the feature model's log-odds (sampled Shapley values). "
@@ -130,7 +150,7 @@ with tab1:
 # ------------------------------------------------------------------ tab 2
 with tab2:
     st.header("Feature distributions")
-    sample_path = BASE / "data" / "sample_urls.csv"
+    sample_path = locate("data", "sample_urls.csv")
     if sample_path.exists():
         sample = load_csv(sample_path)
         sample["class"] = sample["is_phish"].map({0: "legitimate", 1: "phishing"})
@@ -156,34 +176,26 @@ with tab2:
         st.info("data/sample_urls.csv not found.")
 
     st.header("Model results")
-    show_csv_if_exists(BASE / "results" / "url_model_comparison.csv",
-                       "URL-text models (5-fold cross-validation)")
-    show_csv_if_exists(BASE / "results" / "threshold_table.csv",
-                       "Choosing the alert threshold")
-    show_csv_if_exists(BASE / "results" / "robustness_table.csv",
-                       "Robustness: phishing URLs changed to evade the model")
-    show_csv_if_exists(BASE / "results" / "feature_ranking_url_text.csv",
-                       "Which URL-text features carry the most information")
-    show_csv_if_exists(BASE / "results" / "template_share.csv",
-                       "What a 'legitimate' URL looks like in the training data")
-    show_csv_if_exists(BASE / "results" / "shortcut_check.csv",
-                       "Shortcut check: how much of the score is just the URL's shape?")
-    show_csv_if_exists(BASE / "results" / "realworld_sanity.csv",
+    show_csv_if_exists("url_model_comparison.csv", "URL-text models (5-fold cross-validation)")
+    show_csv_if_exists("threshold_table.csv", "Choosing the alert threshold")
+    show_csv_if_exists("robustness_table.csv", "Robustness: phishing URLs changed to evade the model")
+    show_csv_if_exists("feature_ranking_url_text.csv", "Which URL-text features carry the most information")
+    show_csv_if_exists("template_share.csv", "What a 'legitimate' URL looks like in the training data")
+    show_csv_if_exists("shortcut_check.csv", "Shortcut check: how much of the score is just the URL's shape?")
+    show_csv_if_exists("realworld_sanity.csv",
                        "Sanity check on well-known real websites (small, hand-picked, illustrative)")
     col1, col2 = st.columns(2)
     with col1:
-        show_image_if_exists(BASE / "results" / "confusion_roc_final.png",
-                             "Final model, out-of-fold predictions")
+        show_image_if_exists("confusion_roc_final.png", "Final model, out-of-fold predictions")
     with col2:
-        show_image_if_exists(ROOT / "results" / "topk_curve.png",
-                             "How many features are needed (Mining Lead)")
+        show_image_if_exists("topk_curve.png", "How many features are needed (Mining Lead)")
 
 # ------------------------------------------------------------------ tab 3
 with tab3:
     st.header("Cluster explorer")
     st.write("K-means groups of phishing URLs found by the Mining Lead (3 loose groups, "
              "silhouette 0.245, so the groups overlap).")
-    cluster_path = ROOT / "results" / "cluster_profiles.csv"
+    cluster_path = locate("results", "cluster_profiles.csv")
     if cluster_path.exists():
         clusters = load_csv(cluster_path)
         pick = st.selectbox("Cluster", clusters["cluster_name"].tolist())
@@ -200,10 +212,9 @@ with tab3:
         st.write("Example URLs (shown as text only):")
         for u in str(row["example_urls"]).split(" | "):
             st.code(u, language=None)
-        show_image_if_exists(ROOT / "results" / "clusters_pca.png", "Clusters in a 2D PCA view")
+        show_image_if_exists("clusters_pca.png", "Clusters in a 2D PCA view")
     else:
-        st.info("results/cluster_profiles.csv not found. Put the Mining Lead results folder "
-                "next to the product folder.")
+        st.info("results/cluster_profiles.csv not found.")
 
 # ------------------------------------------------------------------ tab 4
 with tab4:
