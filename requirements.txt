@@ -1,9 +1,6 @@
-ucimlrepo
-pandas
-numpy
-scikit-learn
+streamlit>=1.30
+pandas==2.2.3
+numpy==2.1.3
 matplotlib
-seaborn
-scipy
 joblib
-streamlit
+scikit-learn==1.6.1
